@@ -542,7 +542,7 @@
 00BF                             ; 
 00BF                             ; *************************************************************************
 00BF                             ; 
-00BF                             ;       MINTX 2.0 Minimal Interpreter for the Z80
+00BF                             ;       MINTX 1.0 Minimal Interpreter for the Z80
 00BF                             ; 
 00BF                             ;       John Hardy and Ken Boak
 00BF                             ;       incorporates bit-bang serial routines by Craig Jones
@@ -688,7 +688,7 @@
 0218   31 00 0A               LD   SP,DSTACK   ; start of MINTX
 021B   CD DE 02               CALL   init   ; setups
 021E   CD 92 03               CALL   printStr   ; prog count to stack, put code line 235 on stack then call print
-0221   4D 49 4E 54 32 2E 30 0D 0A 00 .CSTR   "MINTX2.0\r\n"   
+0221   4D 49 4E 54 32 2E 30 0D 0A 00 .CSTR   "MINTX1.0\r\n"   
 022B                INTERPRET:      
 022B   CD 82 03               CALL   prompt   
 022E   01 00 00               LD   bc,0   ; load bc with offset into TIB, decide char into tib or execute or control

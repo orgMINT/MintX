@@ -1,4 +1,4 @@
-# MINTX Language 2.0
+# MINTX Language 1.0
 
 MINTX is a minimalist character-based interpreter but one which aims at fast performance, readability and ease of use. It is written for the Z80 microprocessor and is 2K.
 
