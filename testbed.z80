@@ -1,0 +1,26 @@
+    ; comment out this .engine line if you want to single-step
+    ; through the code of your test
+    .engine mycomputer
+
+    .include "constants.asm"
+    .include "test.fast.mac.asm"
+    
+    .include "IOSerial.asm"
+    
+    JP testsStart
+    
+    .include "MAIN.asm"
+    .include "ram.asm"
+    
+    .org $4000
+
+testsStart:
+
+    ; write your string containing a line of MINTX code 
+    ; followed by the expected value of the top of stack after running it
+    test "0t! /U(/i 4 < /W t 1+ t!) t ", 4
+
+    ; if the tests succeed, "Done!" while be printed       
+    print "Done!"
+    HALT
+    
