@@ -1,0 +1,116 @@
+.engine mycomputer
+
+jp testsStart
+
+; =============================================================================
+; Temporary storage location
+temp1: 
+    ds 1                      ; 1-byte storage for carry propagation
+
+.org $100
+
+testsStart:
+
+jp test1
+
+    ; Operand A: 2.0 (0x40000000)
+    call pushFloat
+    db 0x40, 0x00, 0x00, 0x00
+
+    ; Operand B: 3.0 (0x40400000)
+    call pushFloat
+    db 0x40, 0x40, 0x00, 0x00
+
+    ; Expected Result: 6.0 (0x40C00000)
+    call pushFloat
+    db 0x40, 0xC0, 0x00, 0x00
+
+
+test1:
+    call test_case
+    jp test2
+
+; Operand A: 0.0 (0x00000000)
+operand_a2:
+    db 0x00, 0x00, 0x00, 0x00
+
+; Operand B: 5.0 (0x40A00000)
+operand_b2:
+    db 0x40, 0xA0, 0x00, 0x00
+
+; Expected Result: 0.0 (0x00000000)
+expected_result:
+    db 0x00, 0x00, 0x00, 0x00
+
+test2:
+    call test_case
+
+halt
+
+pushFloat:
+    pop hl
+    push hl
+    inc hl
+    inc hl
+    inc hl
+    inc hl
+    jp (hl)
+
+; Test harness for floating-point multiplication
+; HL: Pointer to Operand A
+; DE: Pointer to Operand B
+; IX: Pointer to Result (Expected and Actual)
+test_case:
+    pop bc              ; expected
+    pop de              ; operand B
+    pop hl              ; operand A
+    push bc             ; save expected
+    call mul_fp         ; Perform floating-point multiplication
+    push ix
+    pop de              ; Restore expected result pointer
+    ld bc,4
+
+    ; Compare actual and expected results
+    ld a, (ix)          ; Load actual result
+    cp (bc)             ; Compare to expected result
+    jr nz, test_fail
+    ld a, (ix+1)        ; Compare second byte
+    cp (de+1)
+    jr nz, test_fail
+    ld a, (ix+2)        ; Compare third byte
+    cp (de+2)
+    jr nz, test_fail
+    ld a, (ix+3)        ; Compare fourth byte
+    cp (de+3)
+    jr nz, test_fail
+
+    ; If all bytes match
+    jr test_success
+
+test_fail:
+    ; Handle test failure (e.g., set flag, stop execution)
+    ld a, 0xFF         ; Signal failure
+    out (0x00), a      ; Output failure code
+    halt
+
+test_success:
+    ; Handle test success (e.g., continue)
+    ret
+
+.include "float32.asm"
+.include "print.asm"
+
+COMPARE_32BIT:
+    LD B, 4              ; Set loop counter for 4 bytes
+
+COMPARE_LOOP:
+    LD A, (HL)           ; Load a byte from the first number
+    CP (DE)              ; Compare it with the corresponding byte from the second number
+    RET NZ               ; Return immediately if a mismatch is found
+    INC HL               ; Move to the next byte in the first number
+    INC DE               ; Move to the next byte in the second number
+    DJNZ COMPARE_LOOP    ; Repeat until all 4 bytes are compared
+
+    ; If we finish the loop without mismatches
+    XOR A                ; Clear the accumulator to set Z flag
+    RET                  ; Return with Z flag set
